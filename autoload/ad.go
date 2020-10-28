@@ -8,6 +8,7 @@ import (
 	T "github.com/yuw-pot/pot"
 	E "github.com/yuw-pot/pot/modules/err"
 	R "github.com/yuw-pot/pot/routes"
+	"mvc/app/middleware"
 	"mvc/configs"
 	"mvc/router"
 )
@@ -82,7 +83,8 @@ func (ad *autoload) initialized() *autoload {
 				Mode: R.PoTMethodGeT,
 				Path: "/demo",
 			}:{
-				R.Cors(), c.PoT(ctrl.T),
+				middleware.New().JwTAuth().PoT(),
+				c.PoT(ctrl.T),
 			},
 			&R.KeY{
 				Service: "Demo",
