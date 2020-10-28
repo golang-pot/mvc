@@ -1,2 +1,4 @@
-# mvc
-golang mvc 框架
+###### PoT.
+~~~
+git clone ...
+~~~

@@ -1,0 +1,86 @@
+## PoT ##
+PoT:
+  Name: "PoT"
+  Port: "8577"
+  Mode: 0
+  TimeLocation: "Asia/Shanghai"
+  Addr: ""
+  Hssl:
+    Power: 0
+    CertFile: ""
+    KeysFile: ""
+
+Power:
+  JwT: 1
+  Adapter: 1
+  Redis: 1
+
+JwT:
+  KeY: "77^y8y*eu#"
+  Expire: 1
+  Mode: "H"
+
+Adapter:
+  Mysql:
+    Param:
+      MaxOpen: 2000
+      MaxIdle: 1000
+      ShowedSQL: false
+      CachedSQL: false
+
+    Conns:
+      db_demo:
+        Master:
+          - Host: "127.0.0.1"
+            Port: 3306
+            Username: "root"
+            Password: "root"
+          - Host: "127.0.0.1"
+            Port: 3306
+            Username: "root"
+            Password: "root"
+
+        Slaver:
+          - Host: "127.0.0.1"
+            Port: 3306
+            Username: "root"
+            Password: "root"
+
+Redis:
+  I:
+    Network: "tcp"
+    Addr: "127.0.0.1:6397"
+    Password: ""
+    DB: 0
+  II:
+    Network: "tcp"
+    Addr: "127.0.0.1:6397"
+    Password: ""
+    DB: 1
+
+RedisCluster:
+  Network: "tcp"
+  Password: ""
+  DB: 0
+  AddrCluster:
+    - "127.0.0.1:6397"
+    - "127.0.0.1:6397"
+    - "127.0.0.1:6397"
+
+Logs:
+  PoT:
+    FileName: "./logs/pot/request.log"
+    ZapCoreLevel: "info"
+    Format: "console"
+    Time: "time"
+    Level: "level"
+    Name: "logger"
+    Caller: "caller"
+    Message: "msg"
+    StackTrace: "stacktrace"
+    MaxSize: 1
+    MaxBackUps: 5
+    MaxAge: 7
+
+PoTSelfDefined:
+  Test: "Configure Self Defined Success"
