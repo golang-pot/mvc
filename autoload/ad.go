@@ -5,10 +5,9 @@
 package autoload
 
 import (
-	T "github.com/yuw-pot/pot"
+	PoT "github.com/yuw-pot/pot"
 	E "github.com/yuw-pot/pot/modules/err"
 	R "github.com/yuw-pot/pot/routes"
-	"mvc/app/middleware"
 	"mvc/configs"
 	"mvc/router"
 )
@@ -35,7 +34,7 @@ func init() {
 	// Initialized PoT
 	//   - add PoT Route
 	//   - add PoT Error
-	start := T.New()
+	start := PoT.New()
 	start.PoTRoute = ad.rPoT
 	start.PoTError = ad.ePoT
 
@@ -64,37 +63,36 @@ func (ad *autoload) initialized() *autoload {
 	//   - add Router Array
 	ad.rPoT.Src = &R.RouteSrc { rPoT, rAdminPoT }
 	ad.rPoT.Arr = &R.RouteArr {
-		rAdminPoT.Tag(): {
-			&R.KeY{
-				Service: "Demo",
-				Controller: "Demo",
-				Action: "X",
-				Mode: R.PoTMethodGeT,
-				Path: "/demo_x",
-			}:{
-				c.PoT(ctrl.X),
-			},
-		},
 		rPoT.Tag(): {
 			&R.KeY{
 				Service: "Demo",
 				Controller: "Demo",
-				Action: "T",
+				Action: "Sample",
 				Mode: R.PoTMethodGeT,
-				Path: "/demo",
+				Path: "/sample",
 			}:{
-				middleware.New().JwTAuth().PoT(),
-				c.PoT(ctrl.T),
+				mPoT.Cors(),
+				ctrl.Sample,
 			},
 			&R.KeY{
 				Service: "Demo",
 				Controller: "Demo",
-				Action: "X",
+				Action: "SampleComponents",
 				Mode: R.PoTMethodGeT,
-				Path: "/demo_x",
+				Path: "/sample_components",
 			}:{
-				R.Cors(),
-				c.PoT(ctrl.X),
+				ctrl.SampleComponents,
+			},
+		},
+		rAdminPoT.Tag(): {
+			&R.KeY{
+				Service: "Demo",
+				Controller: "Demo",
+				Action: "AdminDemo",
+				Mode: R.PoTMethodGeT,
+				Path: "/admin_demo",
+			}:{
+				ctrlAdmin.AdminDemo,
 			},
 		},
 	}

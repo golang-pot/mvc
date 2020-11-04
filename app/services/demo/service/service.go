@@ -4,12 +4,14 @@
 
 package service
 
-type Service struct {
+import "github.com/yuw-pot/pot/src/services"
 
+type service struct {
+	parent *services.Services
 }
 
-func New() *Service {
-	return &Service {
-
+func New() *service {
+	return &service {
+		parent: services.New(),
 	}
 }

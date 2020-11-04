@@ -4,13 +4,16 @@
 
 package router
 
-import "github.com/yuw-pot/pot/routes"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/yuw-pot/pot/routes"
+)
 
 func (route *PoT) Tag() string {
 	return TagPoT
 }
 
-func (route *PoT) PuT(r *routes.PoT, toFunc map[*routes.KeY][]interface{}) {
-	routes.To(r.Eng.Group(""), toFunc)
+func (route *PoT) PuT(r *gin.Engine, toFunc map[*routes.KeY][]gin.HandlerFunc) {
+	routes.To(r.Group(""), toFunc)
 }
 

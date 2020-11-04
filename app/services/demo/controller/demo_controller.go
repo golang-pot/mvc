@@ -5,85 +5,96 @@
 package controller
 
 import (
-	"fmt"
-	"github.com/spf13/cast"
+	"github.com/gin-gonic/gin"
 	"github.com/yuw-pot/pot/data"
-	"github.com/yuw-pot/pot/libs"
 	"github.com/yuw-pot/pot/modules/crypto"
+	E "github.com/yuw-pot/pot/modules/err"
+	"github.com/yuw-pot/pot/modules/utils"
+	"github.com/yuw-pot/pot/src/controllers"
 	"mvc/app/services/demo/service"
+	"mvc/configs"
 )
 
 type DemoController struct {
+	parent *controllers.Controller
 	srv *service.DemoService
+	v *utils.PoT
 	cry *crypto.PoT
 }
 
 func NewDemoController() *DemoController {
 	return &DemoController {
+		parent: controllers.New(),
 		srv: service.NewDemoService(),
+		v: utils.New(),
 		cry: crypto.New(),
 	}
 }
 
-func (c *DemoController) X(lib *libs.PoT) {
-	ctx := lib.Lib()
-	//fmt.Println(ctx.GeT().Request.Header)
-	//fmt.Println(ctx.GeT().DefaultQuery("t",""))
-	ctx.JSON(data.PoTStatusOK, data.SrvPoT{
-		Status:   data.PoTStatusOK,
-		Msg:      "",
-		Response: &data.H {
-			"x":"success x",
-		},
-	})
+func (c *DemoController) Sample(ctx *gin.Context) {
+	TpL := data.TpLInitialized()
+	TpL.Msg = E.Err(configs.TPL, configs.SuccessOK).Error()
 
-	ctx.Abort()
+	// get fetch one
+	do := c.srv.FetchOne()
+	doById := c.srv.FetchOneById(2, "id", "create_time")
+	doJoinById := c.srv.FetchOneJoinById(1)
 
+	// get fetch all
+	da := c.srv.FetchAll()
+
+	TpL.Response = c.v.MergeH(
+		TpL.Response,
+		do.Data,
+		doById.Data,
+		doJoinById.Data,
+		da.Data,
+
+		c.srv.Total(),
+		// - get this url path
+		c.srv.GeTPath(),
+	)
+
+	ctx.JSON(TpL.Status, TpL)
 	return
 }
 
-func (c *DemoController) T(lib *libs.PoT) {
-	ctx := lib.Lib()
+func (c *DemoController) SampleComponents(ctx *gin.Context) {
+	TpL := data.TpLInitialized()
+	TpL.Msg = E.Err(configs.TPL, configs.SuccessOK).Error()
 
 	c.cry.Mode = data.ModeToken
-	c.cry.D = []interface{}{data.MD5, "token"}
 
-	token, _ := c.cry.Made()
-	fmt.Println(cast.ToString(token))
+	// - md5
+	c.cry.D = []interface{}{data.MD5, "password_md5"}
+	md5, _ := c.cry.Made()
 
-	c.cry.Mode = data.ModeRsA
-	c.cry.D = []interface{}{"rsa"}
+	// - sha1
+	c.cry.D = []interface{}{data.SHA1, "password_sha1"}
+	sha1, _ := c.cry.Made()
 
-	rsa, _ := c.cry.Made()
-	fmt.Println((rsa.(*crypto.RsAPoT)).T())
+	// - sha256
+	c.cry.D = []interface{}{data.SHA1, "password_sha256"}
+	sha256, _ := c.cry.Made()
 
-	//token, _ := c.jwt.KeY
-	//fmt.Println(string(c.jwt.KeY))
-	//
-	//info := &C.JwTPoT{
-	//	Info: map[string]interface{}{
-	//		"test":"test",
-	//	},
-	//}
-
-	//data, _ := C.JPoT.Made(info)
-	//fmt.Println(data)
-
-	//fmt.Println(C.JPoT.Parse("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJbmZvIjp7InRlc3QiOiJ0ZXN0In0sImV4cCI6MTYwMzI3NzExNn0._eSt-E_EAetXjd5fg5Dpibro_tuoFlUe3gNlIeUZbMk"))
-	//
-	//fmt.Println(d)
-
-	//fmt.Println(E.Err(data.ErrPfx, "PoTModeErr", "test"))
-	//fmt.Println(E.Err(configs.CTR, "CtrErr", E.Position()))
-
-	ctx.JSON(data.PoTStatusOK, data.SrvPoT {
-		Status:   data.PoTStatusOK,
-		Msg:      "test",
-		Response: &data.H {
-			"T":"success T",
+	// components.crypto
+	sampleCrypto := &data.H {
+		"components_crypto": map[string]interface{}{
+			"md5": 		md5,
+			"sha1": 	sha1,
+			"sha256": 	sha256,
 		},
-	})
-	ctx.Abort()
+	}
 
+	// components.cache.redis.client
+	sampleCaches := c.srv.GeTComponentCache()
+
+	TpL.Response = c.v.MergeH(
+		TpL.Response,
+		sampleCrypto,
+		sampleCaches,
+	)
+
+	ctx.JSON(data.PoTStatusOK, TpL)
 	return
 }

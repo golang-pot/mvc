@@ -20,6 +20,9 @@ JwT:
   Expire: 1
   Mode: "H"
 
+Aes:
+  KeY: "77^y8y*eu#AES"
+
 Adapter:
   Mysql:
     Param:
@@ -29,7 +32,7 @@ Adapter:
       CachedSQL: false
 
     Conns:
-      db_demo:
+      db_repo_demo:
         Master:
           - Host: "127.0.0.1"
             Port: 3306

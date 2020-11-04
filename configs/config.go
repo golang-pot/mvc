@@ -9,9 +9,12 @@ import (
 )
 
 const (
-	CTR string = "CTR"
-	SRV string = "SRV"
-	MOD string = "MOD"
+	CTR = "CTR"
+	SRV = "SRV"
+	MOD = "MOD"
+	TPL = "TPL"
+
+	SuccessOK	= "SuccessOK"
 )
 
 var (
@@ -20,9 +23,11 @@ var (
 	//   - SRV: service
 	//   - MOD: model
 	ErrMsg *data.ErrH = &data.ErrH{
+		TPL: {
+			SuccessOK: "Success",
+		},
 		CTR: {
-			"UnKnown": "未知错误",
-			"NoPriority": "无权限",
+
 		},
 		SRV: {
 

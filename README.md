@@ -2,12 +2,12 @@
 
 ### Golang MVC Framework 
 
-##### Quick Start
+##### 1. Quick Start
 ~~~
 git clone https://github.com/golang-pot/mvc.git
 ~~~
 
-##### Enter mvc.git Relative Path
+##### 2. Enter mvc.git Relative Path
 ~~~
 cd $relativePath/mvc
 go mod tidy

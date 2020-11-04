@@ -2,12 +2,12 @@
 
 ### Golang MVC 框架
 
-##### 快速开始
+##### 1. 快速开始
 ~~~
 git clone https://github.com/golang-pot/mvc.git
 ~~~
 
-##### 进入 git clone 相对路径
+##### 2. 进入 git clone 相对路径
 ~~~
 cd $relativePath/mvc
 go mod tidy

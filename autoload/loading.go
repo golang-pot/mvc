@@ -5,12 +5,19 @@
 package autoload
 
 import (
-	"github.com/yuw-pot/pot/src/controllers"
-	"mvc/app/services/demo/controller"
+	middlewarePoT "github.com/yuw-pot/pot/src/middleware"
+	middlewareMvc "mvc/app/middleware"
+	II "mvc/app/services/admin/controller"
+	I "mvc/app/services/demo/controller"
 )
 
 var (
 	// Initialized Controllers
-	c *controllers.Controller = controllers.New()
-	ctrl *controller.DemoController = controller.NewDemoController()
+	ctrl *I.DemoController = I.NewDemoController()
+	ctrlAdmin *II.AdminDemoController = II.NewAdminDemoController()
+
+	// PoT. Middleware Struct
+	mPoT *middlewarePoT.M = middlewarePoT.New()
+	//Self Define Middleware Struct
+	mMvc *middlewareMvc.M = middlewareMvc.New()
 )
