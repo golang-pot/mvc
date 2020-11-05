@@ -9,6 +9,7 @@ import (
 	"github.com/yuw-pot/pot/data"
 	"github.com/yuw-pot/pot/modules/crypto"
 	E "github.com/yuw-pot/pot/modules/err"
+	"github.com/yuw-pot/pot/modules/properties"
 	"github.com/yuw-pot/pot/modules/utils"
 	"github.com/yuw-pot/pot/src/controllers"
 	"mvc/app/services/demo/service"
@@ -29,6 +30,19 @@ func NewDemoController() *DemoController {
 		v: utils.New(),
 		cry: crypto.New(),
 	}
+}
+
+func (c *DemoController) SeTSampleCacheComponent(ctx *gin.Context) {
+	TpL := data.TpLInitialized()
+	TpL.Msg = E.Err(configs.TPL, configs.SuccessOK).Error()
+
+	TpL.Response = c.v.MergeH(
+		TpL.Response,
+		c.srv.SeTComponentCache(),
+	)
+
+	ctx.JSON(data.PoTStatusOK, TpL)
+	return
 }
 
 func (c *DemoController) Sample(ctx *gin.Context) {
@@ -77,12 +91,34 @@ func (c *DemoController) SampleComponents(ctx *gin.Context) {
 	c.cry.D = []interface{}{data.SHA1, "password_sha256"}
 	sha256, _ := c.cry.Made()
 
+	// - aes
+	c.cry.Mode = data.ModeAeS
+
+	aesKeY := properties.PropertyPoT.GeT("AeS.KeY", nil)
+	c.cry.D = []interface{}{aesKeY}
+
+	aes, _ := c.cry.Made()
+	aesEncrypt, err := aes.(*crypto.AeSPoT).EncrypT("test success")
+	if err != nil {
+		aesEncrypt = err.Error()
+	}
+
+	aesDecrypt, err := aes.(*crypto.AeSPoT).DecrypT(aesEncrypt)
+	if err != nil {
+		aesDecrypt = err.Error()
+	}
+
 	// components.crypto
 	sampleCrypto := &data.H {
 		"components_crypto": map[string]interface{}{
-			"md5": 		md5,
-			"sha1": 	sha1,
-			"sha256": 	sha256,
+			"md5": md5,
+			"sha1": sha1,
+			"sha256": sha256,
+
+			"aes": map[string]interface{}{
+				"Encrypt": aesEncrypt,
+				"Decrypt": aesDecrypt,
+			},
 		},
 	}
 

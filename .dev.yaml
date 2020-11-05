@@ -20,7 +20,7 @@ JwT:
   Expire: 1
   Mode: "H"
 
-Aes:
+AeS:
   KeY: "77^y8y*eu#AES"
 
 Adapter:

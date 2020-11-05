@@ -83,6 +83,15 @@ func (ad *autoload) initialized() *autoload {
 			}:{
 				ctrl.SampleComponents,
 			},
+			&R.KeY{
+				Service: "Demo",
+				Controller: "Demo",
+				Action: "SeTSampleCacheComponent",
+				Mode: R.PoTMethodGeT,
+				Path: "/set_sample_cache_components",
+			}:{
+				ctrl.SeTSampleCacheComponent,
+			},
 		},
 		rAdminPoT.Tag(): {
 			&R.KeY{

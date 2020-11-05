@@ -5,22 +5,31 @@
 package service
 
 import (
+	"github.com/spf13/cast"
 	"github.com/yuw-pot/pot/data"
-	"github.com/yuw-pot/pot/src/services/components/cache"
+	"github.com/yuw-pot/pot/modules/properties"
+	"github.com/yuw-pot/pot/src/components/cache"
 	"mvc/app/db/models/repo_demo"
 )
 
 type DemoService struct {
 	mDemo *repo_demo.DemoModel
 	s *service
-	r *cache.RedisComponent
+	client *cache.RedisComponent
 }
 
 func NewDemoService() *DemoService {
+	// add cache prefix
+	cachePrefix := properties.PropertyPoT.GeT("PoT.Name", "")
+
+	// initialized cache client
+	client := cache.NewRedis("I")
+	client.SeTPrefix(cast.ToString(cachePrefix))
+
 	return &DemoService{
 		mDemo: repo_demo.NewDemoModel(),
 		s: New(),
-		r: cache.NewRedis("I"),
+		client: client,
 	}
 }
 
@@ -32,11 +41,48 @@ func (srv *DemoService) GeTPath() *data.H {
 	}
 }
 
+func (srv *DemoService) SeTComponentCache() *data.H {
+	content := &data.H {
+		"SeTCache": "success set cache",
+		"HSeTCache": "Success h set cache",
+	}
+
+	_, err := srv.client.SeT("PoT_cache_component", "test.success!!!")
+	if err != nil {
+		(*content)["SeTCache"] = err.Error()
+	} else {
+		(*content)["SeTCache"] = "success!!"
+	}
+
+	rHSeT := map[string]interface{}{
+		"PoT_HSeT": "success h set cache!!",
+	}
+	_, err = srv.client.HSeT("PoT_H_cache_component", rHSeT)
+	if err != nil {
+		(*content)["HSeTCache"] = err.Error()
+	} else {
+		(*content)["HSeTCache"] = "success!!"
+	}
+
+
+	return content
+}
+
 func (srv *DemoService) GeTComponentCache() *data.H {
-	content, _ := srv.r.GeT("test")
+	okExisT, _ := srv.client.IsExisT("PoT_cache_component")
+	okHExisT, _ := srv.client.IsHExisT("PoT_H_cache_component", "PoT_HSeT")
+
+	contentGeT, _ := srv.client.GeT("PoT_cache_component")
+	contentHGeT, _ := srv.client.HGeT("PoT_H_cache_component", "PoT_HSeT")
+
+	contentKeYs, _ := srv.client.KeYs()
 
 	return &data.H {
-		"components.redis.client": content,
+		"components.redis.client.IsExist": okExisT,
+		"components.redis.client.IsHExist": okHExisT,
+		"components.redis.client.GeT": contentGeT,
+		"components.redis.client.HGeT": contentHGeT,
+		"components.redis.client.KeYs": contentKeYs,
 	}
 }
 

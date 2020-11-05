@@ -21,16 +21,6 @@ type (
 		D Demo `xorm:"extends"`
 		M DemoToMany `xorm:"extends"`
 	}
-
-	DMPoT struct {
-		X interface{}
-		Y interface{}
-	}
-
-	DMForMaTPoT struct {
-		X interface{}
-		Y []interface{}
-	}
 )
 
 
