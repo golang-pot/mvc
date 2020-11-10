@@ -9,7 +9,6 @@ import (
 	"github.com/yuw-pot/pot/data"
 	"github.com/yuw-pot/pot/modules/crypto"
 	E "github.com/yuw-pot/pot/modules/err"
-	"github.com/yuw-pot/pot/modules/properties"
 	"github.com/yuw-pot/pot/modules/utils"
 	"github.com/yuw-pot/pot/src/controllers"
 	"mvc/app/services/demo/service"
@@ -17,18 +16,26 @@ import (
 )
 
 type DemoController struct {
-	parent *controllers.Controller
-	srv *service.DemoService
-	v *utils.PoT
-	cry *crypto.PoT
+	parent 	*controllers.Controller
+	v 		*utils.PoT
+	cry 	*crypto.PoT
+
+	srv 		*service.DemoService
+	srvAuth 	*service.AuthService
+	srvCaches 	*service.CacheService
+	srvCrypto 	*service.CryptoService
 }
 
 func NewDemoController() *DemoController {
 	return &DemoController {
 		parent: controllers.New(),
-		srv: service.NewDemoService(),
-		v: utils.New(),
-		cry: crypto.New(),
+		v: 		utils.New(),
+		cry: 	crypto.New(),
+
+		srv: 		service.NewDemoService(),
+		srvAuth: 	service.NewAuthService(),
+		srvCaches: 	service.NewCacheService(),
+		srvCrypto: 	service.NewCryptoService(),
 	}
 }
 
@@ -38,7 +45,7 @@ func (c *DemoController) SeTSampleCacheComponent(ctx *gin.Context) {
 
 	TpL.Response = c.v.MergeH(
 		TpL.Response,
-		c.srv.SeTComponentCache(),
+		c.srvCaches.SeTComponentCache(),
 	)
 
 	ctx.JSON(data.PoTStatusOK, TpL)
@@ -77,59 +84,38 @@ func (c *DemoController) SampleComponents(ctx *gin.Context) {
 	TpL := data.TpLInitialized()
 	TpL.Msg = E.Err(configs.TPL, configs.SuccessOK).Error()
 
-	c.cry.Mode = data.ModeToken
-
-	// - md5
-	c.cry.D = []interface{}{data.MD5, "password_md5"}
-	md5, _ := c.cry.Made()
-
-	// - sha1
-	c.cry.D = []interface{}{data.SHA1, "password_sha1"}
-	sha1, _ := c.cry.Made()
-
-	// - sha256
-	c.cry.D = []interface{}{data.SHA1, "password_sha256"}
-	sha256, _ := c.cry.Made()
-
-	// - aes
-	c.cry.Mode = data.ModeAeS
-
-	aesKeY := properties.PropertyPoT.GeT("AeS.KeY", nil)
-	c.cry.D = []interface{}{aesKeY}
-
-	aes, _ := c.cry.Made()
-	aesEncrypt, err := aes.(*crypto.AeSPoT).EncrypT("test success")
-	if err != nil {
-		aesEncrypt = err.Error()
-	}
-
-	aesDecrypt, err := aes.(*crypto.AeSPoT).DecrypT(aesEncrypt)
-	if err != nil {
-		aesDecrypt = err.Error()
-	}
-
-	// components.crypto
-	sampleCrypto := &data.H {
-		"components_crypto": map[string]interface{}{
-			"md5": md5,
-			"sha1": sha1,
-			"sha256": sha256,
-
-			"aes": map[string]interface{}{
-				"Encrypt": aesEncrypt,
-				"Decrypt": aesDecrypt,
-			},
-		},
-	}
-
-	// components.cache.redis.client
-	sampleCaches := c.srv.GeTComponentCache()
-
 	TpL.Response = c.v.MergeH(
 		TpL.Response,
-		sampleCrypto,
-		sampleCaches,
+		c.srvCrypto.SampleCrypto(),
+
+		// components.cache.redis.client
+		c.srvCaches.GeTComponentCache(),
+		// JwT
+		c.srvAuth.SampleJwT(),
 	)
+
+	ctx.JSON(data.PoTStatusOK, TpL)
+	return
+}
+
+func (c *DemoController) SampleJwTParse(ctx *gin.Context) {
+	info, ok := ctx.Get("Info")
+	if ok == false {
+		info = &configs.User{}
+	}
+
+	accessToken, ok := ctx.Get("NewAccessToken")
+	if ok == false {
+		accessToken = ""
+	}
+
+	TpL := data.TpLInitialized()
+	TpL.Msg = E.Err(configs.TPL, configs.SuccessOK).Error()
+	TpL.Response = &data.H {
+		"Login": "accessToken Login",
+		"Info": info,
+		"AccessToken": accessToken,
+	}
 
 	ctx.JSON(data.PoTStatusOK, TpL)
 	return

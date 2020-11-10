@@ -7,7 +7,9 @@ package autoload
 import (
 	PoT "github.com/yuw-pot/pot"
 	E "github.com/yuw-pot/pot/modules/err"
+	S "github.com/yuw-pot/pot/modules/subscriber"
 	R "github.com/yuw-pot/pot/routes"
+	"mvc/app/services/demo/service"
 	"mvc/configs"
 	"mvc/router"
 )
@@ -15,6 +17,8 @@ import (
 var (
 	_ R.Routes = new(router.PoT)
 	_ R.Routes = new(router.AdminPoT)
+
+	_ S.Provider = &service.SubscriberService{}
 
 	rPoT *R.PoT = &R.PoT{
 		Src: nil,
@@ -25,6 +29,7 @@ var (
 type autoload struct {
 	rPoT *R.PoT
 	ePoT *E.PoT
+	sPoT *S.PoT
 }
 
 func init() {
@@ -34,9 +39,11 @@ func init() {
 	// Initialized PoT
 	//   - add PoT Route
 	//   - add PoT Error
+	//   - add PoT Subscriber
 	start := PoT.New()
-	start.PoTRoute = ad.rPoT
-	start.PoTError = ad.ePoT
+	start.PoTRoute 			= ad.rPoT
+	start.PoTError 			= ad.ePoT
+	start.PoTSubscriber 	= ad.sPoT
 
 	// Run PoT
 	start.PoT().Run()
@@ -92,6 +99,25 @@ func (ad *autoload) initialized() *autoload {
 			}:{
 				ctrl.SeTSampleCacheComponent,
 			},
+			&R.KeY{
+				Service: "Demo",
+				Controller: "Demo",
+				Action: "SampleJwTParse",
+				Mode: R.PoTMethodGeT,
+				Path: "/sample_jwt_parse",
+			}:{
+				mMvc.JwTCacheAuthRefreshToken(),
+				ctrl.SampleJwTParse,
+			},
+			&R.KeY{
+				Service: "Demo",
+				Controller: "Demo",
+				Action: "SampleJwTParse",
+				Mode: R.PoTMethodGeT,
+				Path: "/sample_publish",
+			}:{
+				ctrlPublish.Publish,
+			},
 		},
 		rAdminPoT.Tag(): {
 			&R.KeY{
@@ -107,5 +133,17 @@ func (ad *autoload) initialized() *autoload {
 	}
 
 	ad.ePoT.ErrMsg = configs.ErrMsg
+	
+	//   - Publish & Subscriber : Keys
+	ad.sPoT = &S.PoT{
+		KeYs:     &S.KeYs{ "services" },
+		Channels: &S.Channels{
+			"services": {
+				service.NewSubscriberService(),
+			},
+		},
+		Pool:     &S.Pool{ S.MethodRdS, "I" },
+	}
+
 	return ad
 }

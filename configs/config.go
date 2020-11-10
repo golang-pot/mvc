@@ -37,3 +37,10 @@ var (
 		},
 	}
 )
+
+type (
+	User struct {
+		UserId int
+		UserName string
+	}
+)

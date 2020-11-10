@@ -41,51 +41,6 @@ func (srv *DemoService) GeTPath() *data.H {
 	}
 }
 
-func (srv *DemoService) SeTComponentCache() *data.H {
-	content := &data.H {
-		"SeTCache": "success set cache",
-		"HSeTCache": "Success h set cache",
-	}
-
-	_, err := srv.client.SeT("PoT_cache_component", "test.success!!!")
-	if err != nil {
-		(*content)["SeTCache"] = err.Error()
-	} else {
-		(*content)["SeTCache"] = "success!!"
-	}
-
-	rHSeT := map[string]interface{}{
-		"PoT_HSeT": "success h set cache!!",
-	}
-	_, err = srv.client.HSeT("PoT_H_cache_component", rHSeT)
-	if err != nil {
-		(*content)["HSeTCache"] = err.Error()
-	} else {
-		(*content)["HSeTCache"] = "success!!"
-	}
-
-
-	return content
-}
-
-func (srv *DemoService) GeTComponentCache() *data.H {
-	okExisT, _ := srv.client.IsExisT("PoT_cache_component")
-	okHExisT, _ := srv.client.IsHExisT("PoT_H_cache_component", "PoT_HSeT")
-
-	contentGeT, _ := srv.client.GeT("PoT_cache_component")
-	contentHGeT, _ := srv.client.HGeT("PoT_H_cache_component", "PoT_HSeT")
-
-	contentKeYs, _ := srv.client.KeYs()
-
-	return &data.H {
-		"components.redis.client.IsExist": okExisT,
-		"components.redis.client.IsHExist": okHExisT,
-		"components.redis.client.GeT": contentGeT,
-		"components.redis.client.HGeT": contentHGeT,
-		"components.redis.client.KeYs": contentKeYs,
-	}
-}
-
 func (srv *DemoService) FetchOne() *data.SrvTpL {
 	TpL := data.SrvTpLInitialized()
 

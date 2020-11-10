@@ -4,15 +4,22 @@
 
 package middleware
 
+import (
+	"github.com/yuw-pot/pot/src/components/cache"
+)
+
 type (
 	M struct {
-
+		client *cache.RedisComponent
 	}
 )
 
 func New() *M {
-	return &M {
+	// initialized cache client
+	client := cache.NewRedis("I")
 
+	return &M {
+		client: client,
 	}
 }
 

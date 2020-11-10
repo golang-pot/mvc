@@ -14,6 +14,7 @@ import (
 var (
 	// Initialized Controllers
 	ctrl *I.DemoController = I.NewDemoController()
+	ctrlPublish *I.PublishController = I.NewPublishController()
 	ctrlAdmin *II.AdminDemoController = II.NewAdminDemoController()
 
 	// PoT. Middleware Struct
