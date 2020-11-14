@@ -5,7 +5,6 @@
 package service
 
 import (
-	"fmt"
 	"github.com/spf13/cast"
 	"github.com/yuw-pot/pot/data"
 	"github.com/yuw-pot/pot/modules/properties"
@@ -32,8 +31,7 @@ func NewCacheService() *CacheService {
 }
 
 func (srv *CacheService) Publish(channel string, message interface{}) *data.H {
-	_, err := srv.client.Publish(channel, message)
-	fmt.Println(err)
+	_, _ = srv.client.Publish(channel, message)
 	return &data.H {
 		"Publish":"",
 	}

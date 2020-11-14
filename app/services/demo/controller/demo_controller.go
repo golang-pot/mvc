@@ -5,8 +5,10 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/yuw-pot/pot/data"
+	"github.com/yuw-pot/pot/modules/casbin"
 	"github.com/yuw-pot/pot/modules/crypto"
 	E "github.com/yuw-pot/pot/modules/err"
 	"github.com/yuw-pot/pot/modules/utils"
@@ -37,6 +39,40 @@ func NewDemoController() *DemoController {
 		srvCaches: 	service.NewCacheService(),
 		srvCrypto: 	service.NewCryptoService(),
 	}
+}
+
+func (c *DemoController) GeTTesTModel(ctx *gin.Context) {
+	//conn, err := adapter.Start(adapter.Mysql, "I")
+	//if err != nil { panic(err) }
+	//
+	//fmt.Println(conn.DataSourceName())
+	//
+	//mod := models.New(conn)
+	//mPoT := &data.ModPoT{
+	//	Types:     "",
+	//	Table:     "",
+	//	Field:     nil,
+	//	Joins:     nil,
+	//	Limit:     0,
+	//	Start:     nil,
+	//	Query:     nil,
+	//	QueryArgs: nil,
+	//	Columns:   nil,
+	//	OrderType: "",
+	//	OrderArgs: nil,
+	//}
+	//
+	//mPoT.Types = data.ModONE
+	//mPoT.Columns = []string{"id", "name", "create_time"}
+	//
+	//d := &repo_demo.Demo{}
+	//_, err = mod.GeT(mPoT, d)
+	//
+	//if err != nil { panic(err) }
+	//fmt.Println(d)
+
+	ctx.Abort()
+	return
 }
 
 func (c *DemoController) SeTSampleCacheComponent(ctx *gin.Context) {
@@ -84,14 +120,32 @@ func (c *DemoController) SampleComponents(ctx *gin.Context) {
 	TpL := data.TpLInitialized()
 	TpL.Msg = E.Err(configs.TPL, configs.SuccessOK).Error()
 
+	// GeT This Service, Controller, Action
+	service, controller, action := c.v.GeTUintPtrFuncPC()
+
+	casbinEnforcer := casbin.New()
+	casbinEnforcer.AdapterInfo = &casbin.AdapterRedis{Tag:"I"}
+	fmt.Println(casbinEnforcer.Enforcer())
+	fmt.Println(casbinEnforcer.Add("admin", "d1", "read"))
+
+	fmt.Println(casbinEnforcer.Check("admin","d1","read"))
+	fmt.Println(casbinEnforcer.Check("admin","d1","w"))
+
 	TpL.Response = c.v.MergeH(
 		TpL.Response,
 		c.srvCrypto.SampleCrypto(),
 
 		// components.cache.redis.client
-		c.srvCaches.GeTComponentCache(),
+		//c.srvCaches.GeTComponentCache(),
 		// JwT
-		c.srvAuth.SampleJwT(),
+		//c.srvAuth.SampleJwT(),
+
+		// GeT UintPtr Service, Controller, Action
+		&data.H {
+			"uintptr_func_pc_service": service,
+			"uintptr_func_pc_controller": controller,
+			"uintptr_func_pc_action": action,
+		},
 	)
 
 	ctx.JSON(data.PoTStatusOK, TpL)

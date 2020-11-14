@@ -15,7 +15,7 @@ type DemoModel struct {
 }
 
 func NewDemoModel() *DemoModel {
-	conn, err := adapter.Made(adapter.Mysql, repo)
+	conn, err := adapter.Conns(adapter.Mysql, "I")
 	if err != nil { panic(err) }
 
 	return &DemoModel {

@@ -112,11 +112,20 @@ func (ad *autoload) initialized() *autoload {
 			&R.KeY{
 				Service: "Demo",
 				Controller: "Demo",
-				Action: "SampleJwTParse",
+				Action: "Publish",
 				Mode: R.PoTMethodGeT,
 				Path: "/sample_publish",
 			}:{
 				ctrlPublish.Publish,
+			},
+			&R.KeY{
+				Service: "Demo",
+				Controller: "Demo",
+				Action: "GeTTesTModel",
+				Mode: R.PoTMethodGeT,
+				Path: "/sample_get_test_model",
+			}:{
+				ctrl.GeTTesTModel,
 			},
 		},
 		rAdminPoT.Tag(): {
